@@ -1,17 +1,44 @@
-import React, { Fragment, useReducer } from "react";
-import "./styles.css";
+import React, { Fragment, useEffect, useReducer } from "react";
+
+import TodoForm from "./TodoForm";
+import TodoList from "./TodoList";
 import todoReducer from "./todoReducer";
 
-const TodoApp = () => {
-  const initialState = [
-    {
-      id: new Date().getTime(),
-      desc: "Aprender React",
-      done: false,
-    },
-  ];
+import "./styles.css";
 
-  const [todos] = useReducer(todoReducer, initialState);
+const TodoApp = () => {
+  const init = () => {
+    return JSON.parse(localStorage.getItem("todos")) || [];
+  };
+
+  const [todos, dispatch] = useReducer(todoReducer, [], init);
+
+  const handleNewTodo = (newTodo) => {
+    dispatch({
+      type: "add",
+      payload: newTodo,
+    });
+  };
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
+  const handleDelete = (todoId) => {
+    const action = {
+      type: "delete",
+      payload: todoId,
+    };
+
+    dispatch(action);
+  };
+
+  const handleToggle = (todoId) => {
+    dispatch({
+      type: "toggle",
+      payload: todoId,
+    });
+  };
 
   return (
     <Fragment>
@@ -19,32 +46,14 @@ const TodoApp = () => {
       <hr />
       <div className="row">
         <div className="col-7">
-          <ul className="list-group list-group-flush">
-            {todos.map(({ id, desc, done }, i) => (
-              <Fragment>
-                <li key={id} className="list-group-item">
-                  <p className="text-center">
-                    {i + 1}. {desc}
-                  </p>
-                  <button className="btn btn-danger">Borrar</button>
-                </li>
-              </Fragment>
-            ))}
-          </ul>
+          <TodoList
+            todos={todos}
+            handleToggle={handleToggle}
+            handleDelete={handleDelete}
+          />
         </div>
         <div className="col-5">
-          <h4>Agregar TODO</h4>
-          <hr />
-          <form>
-            <input
-              type="text"
-              name="description"
-              placeholder="Aprender ...."
-              autoComplete="false"
-              className="form-control mb-3"
-            />
-            <button className="btn btn-outline-primary w-100">Agregar</button>
-          </form>
+          <TodoForm handleNewTodo={handleNewTodo} />
         </div>
       </div>
     </Fragment>

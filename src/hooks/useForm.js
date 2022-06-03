@@ -3,6 +3,10 @@ const useForm = (initialState = {}) => {
 
   const [values, setValue] = React.useState(initialState)
 
+  const resetForm = () => {
+    setValue(initialState);
+  }
+
   const handleInputChange = ({ target }) => {
     const { name, value } = target;
     setValue({
@@ -11,12 +15,7 @@ const useForm = (initialState = {}) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(values);
-  }
-
-  return [values, handleInputChange, handleSubmit]
+  return [values, handleInputChange, resetForm]
 }
 
 export default useForm
